@@ -1,0 +1,12 @@
+{
+    "extends": "../tsconfig.json",
+    "compilerOptions": {
+        "types": [
+            "../../../standalone"
+        ],
+        "lib": ["es6", "dom"],
+    },
+    "include": [
+      "./*.ts"
+    ]
+}

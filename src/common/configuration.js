@@ -3,27 +3,79 @@
  * https://github.com/dmester/jdenticon
  * Copyright © Daniel Mester Pirttijärvi
  */
-"use strict";
 
-const color = require("../renderer/color");
+import { parseColor } from "../renderer/color";
+import { GLOBAL } from "./global";
+
+/**
+ * @typedef {Object} ParsedConfiguration
+ * @property {number} colorSaturation
+ * @property {number} grayscaleSaturation
+ * @property {string} backColor
+ * @property {number} iconPadding
+ * @property {function(number):number} hue
+ * @property {function(number):number} colorLightness
+ * @property {function(number):number} grayscaleLightness
+ */
+
+export const CONFIG_PROPERTIES = {
+    GLOBAL: "jdenticon_config",
+    MODULE: "config",
+};
+
+var rootConfigurationHolder = {};
+
+/**
+ * Defines the deprecated `config` property on the root Jdenticon object. When the property is set a warning is 
+ * printed in the console. To minimize bundle size, this is only used in Node bundles.
+ * @param {!Object} rootObject 
+ */
+export function defineConfigPropertyWithWarn(rootObject) {
+    Object.defineProperty(rootObject, CONFIG_PROPERTIES.MODULE, {
+        configurable: true,
+        get: () => rootConfigurationHolder[CONFIG_PROPERTIES.MODULE],
+        set: newConfiguration => {
+            rootConfigurationHolder[CONFIG_PROPERTIES.MODULE] = newConfiguration;
+            console.warn("jdenticon.config is deprecated. Use jdenticon.configure() instead.");
+        },
+    });
+}
+
+/**
+ * Defines the deprecated `config` property on the root Jdenticon object without printing a warning in the console
+ * when it is being used.
+ * @param {!Object} rootObject 
+ */
+export function defineConfigProperty(rootObject) {
+    rootConfigurationHolder = rootObject;
+}
+
+/**
+ * Sets a new icon style configuration. The new configuration is not merged with the previous one. * 
+ * @param {Object} newConfiguration - New configuration object.
+ */
+export function configure(newConfiguration) {
+    if (arguments.length) {
+        rootConfigurationHolder[CONFIG_PROPERTIES.MODULE] = newConfiguration;
+    }
+    return rootConfigurationHolder[CONFIG_PROPERTIES.MODULE];
+}
 
 /**
  * Gets the normalized current Jdenticon color configuration. Missing fields have default values.
- * @param {Object} jdenticon - The public Jdenticon API object, on which the public `config` property is set.
- * @param {Object} global - The global object, `window` in the browser and `module` on Node, in which the
- *    `jdenticon_config` variable can be declared.
  * @param {Object|number|undefined} paddingOrLocalConfig - Configuration passed to the called API method. A
  *    local configuration overrides the global configuration in it entirety. This parameter can for backward
- *    compatbility also contain a padding value. A padding value only overrides the global padding, not the
+ *    compatibility also contain a padding value. A padding value only overrides the global padding, not the
  *    entire global configuration.
  * @param {number} defaultPadding - Padding used if no padding is specified in neither the configuration nor
  *    explicitly to the API method.
+ * @returns {ParsedConfiguration}
  */
-function configuration(jdenticon, global, paddingOrLocalConfig, defaultPadding) {
-    var configObject = 
+export function getConfiguration(paddingOrLocalConfig, defaultPadding) {
+    const configObject = 
             typeof paddingOrLocalConfig == "object" && paddingOrLocalConfig ||
-            jdenticon["config"] ||
-            global["jdenticon_config"] ||
+            rootConfigurationHolder[CONFIG_PROPERTIES.MODULE] ||
+            GLOBAL[CONFIG_PROPERTIES.GLOBAL] ||
             { },
 
         lightnessConfig = configObject["lightness"] || { },
@@ -41,7 +93,7 @@ function configuration(jdenticon, global, paddingOrLocalConfig, defaultPadding) 
      * Creates a lightness range.
      */
     function lightness(configName, defaultRange) {
-        var range = lightnessConfig[configName];
+        let range = lightnessConfig[configName];
         
         // Check if the lightness range is an array-like object. This way we ensure the
         // array contain two values at the same time.
@@ -63,7 +115,8 @@ function configuration(jdenticon, global, paddingOrLocalConfig, defaultPadding) 
      * provided the originally computed hue.
      */
     function hueFunction(originalHue) {
-        var hueConfig = configObject["hues"], hue;
+        const hueConfig = configObject["hues"];
+        let hue;
         
         // Check if 'hues' is an array-like object. This way we also ensure that
         // the array is not empty, which would mean no hue restriction.
@@ -90,12 +143,10 @@ function configuration(jdenticon, global, paddingOrLocalConfig, defaultPadding) 
         grayscaleSaturation: typeof grayscaleSaturation == "number" ? grayscaleSaturation : 0,
         colorLightness: lightness("color", [0.4, 0.8]),
         grayscaleLightness: lightness("grayscale", [0.3, 0.9]),
-        backColor: color.parse(backColor),
-        padding: 
+        backColor: parseColor(backColor),
+        iconPadding: 
             typeof paddingOrLocalConfig == "number" ? paddingOrLocalConfig : 
             typeof padding == "number" ? padding : 
             defaultPadding
     }
 }
-
-module.exports = configuration;

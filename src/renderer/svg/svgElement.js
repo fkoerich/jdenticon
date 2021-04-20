@@ -3,75 +3,86 @@
  * https://github.com/dmester/jdenticon
  * Copyright © Daniel Mester Pirttijärvi
  */
-"use strict";
+
+import { SVG_CONSTANTS } from "./constants";
 
 /**
  * Creates a new element and adds it to the specified parent.
  * @param {Element} parentNode
  * @param {string} name
- * @param {...*} keyValuePairs
+ * @param {...(string|number)} keyValuePairs
  */
-function SvgElement_append(parentNode, name, keyValuePairs) {
-    var el = document.createElementNS("http://www.w3.org/2000/svg", name);
+function SvgElement_append(parentNode, name, ...keyValuePairs) {
+    const el = document.createElementNS(SVG_CONSTANTS.XMLNS, name);
     
-    for (var i = 2; i + 1 < arguments.length; i += 2) {
-        el.setAttribute(arguments[i], arguments[i + 1]);
+    for (let i = 0; i + 1 < keyValuePairs.length; i += 2) {
+        el.setAttribute(
+            /** @type {string} */(keyValuePairs[i]),
+            /** @type {string} */(keyValuePairs[i + 1]),
+            );
     }
 
     parentNode.appendChild(el);
 }
 
+
 /**
  * Renderer producing SVG output.
- * @private
- * @constructor
  */
-function SvgElement(element) {
-    // Don't use the clientWidth and clientHeight properties on SVG elements
-    // since Firefox won't serve a proper value of these properties on SVG
-    // elements (https://bugzilla.mozilla.org/show_bug.cgi?id=874811)
-    // Instead use 100px as a hardcoded size (the svg viewBox will rescale 
-    // the icon to the correct dimensions)
-    this.size = Math.min(
-        (Number(element.getAttribute("width")) || 100),
-        (Number(element.getAttribute("height")) || 100)
-        );
-    this._el = element;
-    
-    // Clear current SVG child elements
-    while (element.firstChild) {
-        element.removeChild(element.firstChild);
+export class SvgElement {
+    /**
+     * @param {Element} element - Target element
+     */
+    constructor(element) {
+        // Don't use the clientWidth and clientHeight properties on SVG elements
+        // since Firefox won't serve a proper value of these properties on SVG
+        // elements (https://bugzilla.mozilla.org/show_bug.cgi?id=874811)
+        // Instead use 100px as a hardcoded size (the svg viewBox will rescale 
+        // the icon to the correct dimensions)
+        const iconSize = this.iconSize = Math.min(
+            (Number(element.getAttribute(SVG_CONSTANTS.WIDTH)) || 100),
+            (Number(element.getAttribute(SVG_CONSTANTS.HEIGHT)) || 100)
+            );
+        
+        /**
+         * @type {Element}
+         * @private
+         */
+        this._el = element;
+        
+        // Clear current SVG child elements
+        while (element.firstChild) {
+            element.removeChild(element.firstChild);
+        }
+        
+        // Set viewBox attribute to ensure the svg scales nicely.
+        element.setAttribute("viewBox", "0 0 " + iconSize + " " + iconSize);
+        element.setAttribute("preserveAspectRatio", "xMidYMid meet");
     }
-    
-    // Set viewBox attribute to ensure the svg scales nicely.
-    element.setAttribute("viewBox", "0 0 " + this.size + " " + this.size);
-    element.setAttribute("preserveAspectRatio", "xMidYMid meet");
-}
-SvgElement.prototype = {
+
     /**
      * Fills the background with the specified color.
      * @param {string} fillColor  Fill color on the format #rrggbb.
      * @param {number} opacity  Opacity in the range [0.0, 1.0].
      */
-    setBackground: function (fillColor, opacity) {
+    setBackground(fillColor, opacity) {
         if (opacity) {
             SvgElement_append(this._el, "rect",
-                "width", "100%",
-                "height", "100%",
+                SVG_CONSTANTS.WIDTH, "100%",
+                SVG_CONSTANTS.HEIGHT, "100%",
                 "fill", fillColor,
                 "opacity", opacity);
         }
-    },
+    }
+
     /**
      * Appends a path to the SVG element.
      * @param {string} color Fill color on format #xxxxxx.
      * @param {string} dataString The SVG path data string.
      */
-    append: function (color, dataString) {
+    appendPath(color, dataString) {
         SvgElement_append(this._el, "path",
             "fill", color,
             "d", dataString);
     }
-};
-
-module.exports = SvgElement;
+}

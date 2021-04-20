@@ -3,10 +3,11 @@ JavaScript library for generating highly recognizable identicons using HTML5 can
 
 ![Sample identicons](https://jdenticon.com/hosted/github-samples.png)
 
-[![Build Status](https://travis-ci.org/dmester/jdenticon.svg?branch=master)](https://travis-ci.org/dmester/jdenticon)
-[![Downloads](https://img.shields.io/npm/dt/jdenticon.svg)](https://www.npmjs.com/package/jdenticon)
-[![npm bundle size](https://img.shields.io/bundlephobia/min/jdenticon.svg)](https://bundlephobia.com/result?p=jdenticon)
-[![License MIT](https://img.shields.io/badge/license-MIT-green.svg)](https://github.com/dmester/jdenticon/blob/master/LICENSE)
+[![Tests](https://img.shields.io/github/workflow/status/dmester/jdenticon/Tests/master?style=flat-square)](https://github.com/dmester/jdenticon/actions)
+[![Downloads](https://img.shields.io/npm/dt/jdenticon.svg?style=flat-square)](https://www.npmjs.com/package/jdenticon)
+[![jsDelivr](https://data.jsdelivr.com/v1/package/npm/jdenticon/badge?style=flat-square)](https://www.jsdelivr.com/package/npm/jdenticon)
+[![npm bundle size](https://img.shields.io/bundlephobia/min/jdenticon.svg?style=flat-square)](https://bundlephobia.com/result?p=jdenticon)
+[![License MIT](https://img.shields.io/badge/license-MIT-green.svg?style=flat-square)](https://github.com/dmester/jdenticon/blob/master/LICENSE)
 
 ## Live demo
 https://jdenticon.com
@@ -35,12 +36,15 @@ use it right off [jsDelivr](https://www.jsdelivr.com).
 
 ```HTML
 <!-- Using jsDelivr -->
-<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/jdenticon@2.2.0"></script>
+<script src="https://cdn.jsdelivr.net/npm/jdenticon@3.1.0/dist/jdenticon.min.js"
+        integrity="sha384-VngWWnG9GS4jDgsGEUNaoRQtfBGiIKZTiXwm9KpgAeaRn6Y/1tAFiyXqSzqC8Ga/"
+        crossorigin="anonymous">
+</script>
 
 <!-- OR -->
 
 <!-- Hosting it yourself -->
-<script type="text/javascript" src="-path-to-/jdenticon.min.js"></script>
+<script src="-path-to-/jdenticon.min.js"></script>
 ```
 That's it!
 
@@ -54,6 +58,8 @@ https://jdenticon.com
 There are ports or bindings for Jdenticon available for the following platforms:
 
 * [PHP](https://github.com/dmester/jdenticon-php/)
+* [React](https://www.npmjs.com/package/react-jdenticon)
+* [Angular](https://www.npmjs.com/package/ngx-jdenticon)
 * [.NET](https://github.com/dmester/jdenticon-net/)
 * [Polymer](https://github.com/GeoloeG/identicon-element)
 * [Swift](https://github.com/aleph7/jdenticon-swift)

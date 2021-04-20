@@ -1,0 +1,10 @@
+{
+    "extends": "../tsconfig.json",
+    "compilerOptions": {
+        "types": [ "Node" ],
+        "lib": [ "es6" ],
+    },
+    "include": [
+      "./*.ts"
+    ]
+}
